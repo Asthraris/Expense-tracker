@@ -1,14 +1,33 @@
-import 'package:flutter/material.dart';
+import 'dart:developer';
 
-class HomeScreen extends StatelessWidget {
+import 'package:flutter/material.dart';
+import 'package:poorometer/screens/home/views/main_src.dart';
+import 'package:poorometer/screens/home/views/stats-src.dart';
+
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => HomeScreenState();
+}
+
+class HomeScreenState extends State<HomeScreen> {
+  var widgetList = [MainScreen(), statsScreen()];
+  int index = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      // appBar: AppBar(),
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Color.fromARGB(255, 27, 39, 39),
+        onTap: (value) {
+          setState(() {
+            if (value > 1) log("Hacker hai bhai Hacker!");
+            index = value;
+          });
+        },
+
+        backgroundColor: Theme.of(context).colorScheme.tertiary,
         showSelectedLabels: false,
         showUnselectedLabels: false,
         items: const [
@@ -16,6 +35,13 @@ class HomeScreen extends StatelessWidget {
           BottomNavigationBarItem(icon: Icon(Icons.assessment), label: "Stats"),
         ],
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: FloatingActionButton(
+        shape: const CircleBorder(),
+        onPressed: () {},
+        child: Icon(Icons.add),
+      ),
+      body: widgetList[index],
     );
   }
 }

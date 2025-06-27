@@ -11,11 +11,11 @@ class MyAppView extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.dark(
           //change this theme app
-          surface: Color(0xFF333446),
+          surface: Color(0xFF181C14),
           onSurface: Color(0xFFEAEFEF),
-          primary: Color(0xFF7F8CAA),
-          secondary: Color(0xFFB8CFCE),
-          tertiary: Color(0xFFEAEFEF),
+          primary: Color(0xFFECDFCC),
+          secondary: Color(0xFF697565),
+          tertiary: Color(0xFF3C3D37),
         ),
       ),
       home: const HomeScreen(),
