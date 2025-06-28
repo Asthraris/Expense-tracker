@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:poorometer/screens/home/views/add_exp.dart';
 import 'package:poorometer/screens/home/views/main_src.dart';
 import 'package:poorometer/screens/home/views/stats-src.dart';
 
@@ -38,7 +39,15 @@ class HomeScreenState extends State<HomeScreen> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
         shape: const CircleBorder(),
-        onPressed: () {},
+        onPressed: () {
+          showModalBottomSheet(
+            context: context,
+
+            backgroundColor: Colors.transparent,
+            isScrollControlled: false,
+            builder: (_) => const AddExpense(),
+          );
+        },
         child: Icon(Icons.add),
       ),
       body: widgetList[index],
