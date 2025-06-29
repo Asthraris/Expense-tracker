@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "795029771605",
+    "project_id": "poorometer",
+    "storage_bucket": "poorometer.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:795029771605:android:87670c9dcd7507f3368bdc",
+        "android_client_info": {
+          "package_name": "com.example.poorometer"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBhFJnRdohq4nh7C5ZzIEIUOiHsl6RkFJ0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

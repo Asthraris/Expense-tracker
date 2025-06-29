@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 class AddExpense extends StatefulWidget {
@@ -14,12 +15,14 @@ class _AddExpenseState extends State<AddExpense> {
     "Food",
     "EMI",
     "Rent",
+    "Transport",
     "Clothes",
     "Others",
     "Debt",
-    "Owe",
-    "Bill",
+    "Bills",
     "Education",
+    "Shoping",
+    "luxury",
   ];
   int _transactionType = 1;
   TextEditingController labelControll = TextEditingController();
@@ -29,29 +32,45 @@ class _AddExpenseState extends State<AddExpense> {
   Widget dropBoxSelector() {
     return StatefulBuilder(
       builder: (context, setState) {
-        return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 180),
-          decoration: BoxDecoration(
-            color: const Color.fromARGB(15, 0, 0, 0),
-            borderRadius: BorderRadius.circular(30),
-          ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-              value: _trans_category,
-              borderRadius: BorderRadius.circular(16),
-              dropdownColor: Colors.grey[850],
-              iconEnabledColor: Colors.white,
-              style: const TextStyle(color: Colors.white),
-              items: options.map((String item) {
-                return DropdownMenuItem<String>(value: item, child: Text(item));
-              }).toList(),
-              onChanged: (String? newValue) {
-                if (newValue != null) {
-                  setState(() => _trans_category = newValue);
-                }
-              },
+        return DropdownMenu<String>(
+          initialSelection: _trans_category,
+          width: 1200,
+          inputDecorationTheme: const InputDecorationTheme(
+            filled: true,
+            contentPadding: EdgeInsets.symmetric(horizontal: 20),
+            fillColor: const Color.fromARGB(15, 0, 0, 0),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(30)),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(30)),
+              borderSide: BorderSide.none,
             ),
           ),
+          menuStyle: const MenuStyle(
+            maximumSize: WidgetStatePropertyAll<Size>(Size(335, 300)),
+            backgroundColor: WidgetStatePropertyAll(
+              Color.fromARGB(255, 57, 57, 57),
+            ),
+            surfaceTintColor: WidgetStatePropertyAll(Colors.transparent),
+            shape: WidgetStatePropertyAll(
+              RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(16)),
+              ),
+            ),
+          ),
+          textStyle: const TextStyle(color: Colors.white, fontSize: 20),
+          trailingIcon: const Icon(Icons.arrow_drop_up, color: Colors.white),
+          dropdownMenuEntries: options
+              .map(
+                (item) => DropdownMenuEntry<String>(value: item, label: item),
+              )
+              .toList(),
+          onSelected: (String? newValue) {
+            if (newValue != null) {
+              setState(() => _trans_category = newValue);
+            }
+          },
         );
       },
     );
