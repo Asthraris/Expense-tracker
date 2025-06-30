@@ -21,6 +21,7 @@ class TransactionEntity {
       'category': category,
       'date': date,
       'amount': amount,
+      'name': name,
     };
   }
 

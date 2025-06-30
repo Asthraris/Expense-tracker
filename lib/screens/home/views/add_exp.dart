@@ -1,6 +1,12 @@
+import 'package:expense_repository/expense_repository.dart';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:poorometer/screens/home/views/blocs/create_tran_BLOC/create_transaction_bloc.dart';
+import 'package:poorometer/screens/home/views/blocs/get_tran_BLOC/get_tran_bloc.dart';
+
+import 'package:uuid/uuid.dart';
 
 class AddExpense extends StatefulWidget {
   const AddExpense({super.key});
@@ -9,8 +15,11 @@ class AddExpense extends StatefulWidget {
   State<AddExpense> createState() => _AddExpenseState();
 }
 
+//Agar DateTime DB me slow hoga toh String save karunga
 class _AddExpenseState extends State<AddExpense> {
-  String _trans_category = "Food";
+  int localTransactionType = 1;
+  // If you're sure that a variable is set before it's used, but Dart disagrees, you can fix the error by marking the variable as late:
+
   List<String> options = [
     "Food",
     "EMI",
@@ -24,16 +33,18 @@ class _AddExpenseState extends State<AddExpense> {
     "Shoping",
     "luxury",
   ];
-  int _transactionType = 1;
   TextEditingController labelControll = TextEditingController();
   TextEditingController costControll = TextEditingController();
   TextEditingController dateControll = TextEditingController();
+  late Transaction transac;
+  bool isloading = false;
 
   Widget dropBoxSelector() {
     return StatefulBuilder(
       builder: (context, setState) {
         return DropdownMenu<String>(
-          initialSelection: _trans_category,
+          //idhar problem aa sakta if this func gets called before getting transaction instance
+          initialSelection: transac.category,
           width: 1200,
           inputDecorationTheme: const InputDecorationTheme(
             filled: true,
@@ -68,7 +79,7 @@ class _AddExpenseState extends State<AddExpense> {
               .toList(),
           onSelected: (String? newValue) {
             if (newValue != null) {
-              setState(() => _trans_category = newValue);
+              setState(() => transac.category = newValue);
             }
           },
         );
@@ -80,17 +91,17 @@ class _AddExpenseState extends State<AddExpense> {
     return GestureDetector(
       onHorizontalDragEnd: (details) {
         if (details.primaryVelocity == null) return;
-        if (details.primaryVelocity! < 0 && _transactionType == 0) {
-          setState(() => _transactionType = 1);
-        } else if (details.primaryVelocity! > 0 && _transactionType == 1) {
-          setState(() => _transactionType = 0);
+        if (details.primaryVelocity! < 0 && localTransactionType == 1) {
+          setState(() => localTransactionType = 0);
+        } else if (details.primaryVelocity! > 0 && localTransactionType == 0) {
+          setState(() => localTransactionType = 1);
         }
       },
       child: Container(
         height: 50,
         margin: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
         decoration: BoxDecoration(
-          color: _transactionType == 0
+          color: localTransactionType == 0
               ? const Color.fromARGB(80, 102, 187, 106)
               : const Color.fromARGB(80, 239, 83, 80),
           borderRadius: BorderRadius.circular(30),
@@ -99,14 +110,14 @@ class _AddExpenseState extends State<AddExpense> {
           children: [
             AnimatedAlign(
               duration: const Duration(milliseconds: 200),
-              alignment: _transactionType == 0
+              alignment: localTransactionType == 0
                   ? Alignment.centerLeft
                   : Alignment.centerRight,
               child: Container(
                 width: MediaQuery.of(context).size.width * 0.42,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(25),
-                  color: _transactionType == 0
+                  color: localTransactionType == 0
                       ? Colors.green.shade400
                       : Colors.red.shade400,
                 ),
@@ -125,12 +136,14 @@ class _AddExpenseState extends State<AddExpense> {
     return Expanded(
       child: InkWell(
         borderRadius: BorderRadius.circular(30),
-        onTap: () => setState(() => _transactionType = index),
+        onTap: () => setState(() => localTransactionType = index),
         child: Center(
           child: Text(
             label,
             style: TextStyle(
-              color: _transactionType == index ? Colors.white : Colors.white70,
+              color: localTransactionType == index
+                  ? Colors.white
+                  : Colors.white70,
               fontWeight: FontWeight.bold,
               fontSize: 18,
             ),
@@ -142,136 +155,179 @@ class _AddExpenseState extends State<AddExpense> {
 
   @override
   void initState() {
-    dateControll.text = DateFormat("dd/MM/yy").format(DateTime.now());
+    transac = Transaction.empty;
+    dateControll.text = DateFormat("dd/MM/yy").format(transac.date);
+    //start your transaction as defualt calegory , i am not HARDcoding it in backend
+    transac.trans_id = Uuid().v1();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
-      child: Container(
-        height: 550,
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.tertiary,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const Text(
-              "Add Transaction",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+    return BlocListener<CreateTransactionBloc, CreateTransactionState>(
+      listener: (context, state) {
+        if (state is CreateTransactionLoading) {
+          setState(() {
+            isloading = true;
+          });
+        } else if (state is CreateTransactionSuccess) {
+          setState(() {
+            isloading = false;
+          });
+          context.read<GetTranBloc>().add(GetTransactions());
+          Navigator.of(context).pop();
+        } else if (state is CreateTransactionSuccess) {
+          setState(() {
+            isloading = false;
+          });
+          context.read<GetTranBloc>().add(GetTransactions());
+          Navigator.of(context).pop();
+        }
+      },
+      child: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: Container(
+          height: 550,
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.tertiary,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Text(
+                "Add Transaction",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            SizedBox(height: 25),
+              SizedBox(height: 25),
 
-            creditDebitSlider(),
+              creditDebitSlider(),
 
-            //for name
-            Container(
-              height: 70,
-              margin: const EdgeInsets.symmetric(horizontal: 20),
-              child: TextFormField(
-                controller: labelControll,
-                keyboardType: TextInputType.name,
-                textAlign: TextAlign.center,
-                decoration: InputDecoration(
-                  hintText: "Label",
-                  filled: true,
-                  fillColor: const Color.fromARGB(50, 0, 0, 0),
-                  prefixIcon: Icon(Icons.label),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    borderSide: BorderSide.none,
+              //for name
+              Container(
+                height: 70,
+                margin: const EdgeInsets.symmetric(horizontal: 20),
+                child: TextFormField(
+                  controller: labelControll,
+                  keyboardType: TextInputType.name,
+                  textAlign: TextAlign.center,
+                  decoration: InputDecoration(
+                    hintText: "Label",
+                    filled: true,
+                    fillColor: const Color.fromARGB(50, 0, 0, 0),
+                    prefixIcon: Icon(Icons.label),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
+                      borderSide: BorderSide.none,
+                    ),
                   ),
                 ),
               ),
-            ),
-            //for Price
-            Container(
-              height: 70,
-              margin: const EdgeInsets.symmetric(horizontal: 20),
-              child: TextFormField(
-                controller: costControll,
-                keyboardType: TextInputType.number,
-                textAlign: TextAlign.center,
-                decoration: InputDecoration(
-                  hintText: "Cost",
-                  filled: true,
-                  fillColor: const Color.fromARGB(50, 0, 0, 0),
-                  prefixIcon: Icon(Icons.currency_rupee),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    borderSide: BorderSide.none,
+              //for Price
+              Container(
+                height: 70,
+                margin: const EdgeInsets.symmetric(horizontal: 20),
+                child: TextFormField(
+                  controller: costControll,
+                  keyboardType: TextInputType.number,
+                  textAlign: TextAlign.center,
+                  decoration: InputDecoration(
+                    hintText: "Cost",
+                    filled: true,
+                    fillColor: const Color.fromARGB(50, 0, 0, 0),
+                    prefixIcon: Icon(Icons.currency_rupee),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
+                      borderSide: BorderSide.none,
+                    ),
                   ),
                 ),
               ),
-            ),
 
-            //for date <Option not type>
-            Container(
-              height: 70,
-              margin: const EdgeInsets.symmetric(horizontal: 20),
-              child: TextFormField(
-                controller: dateControll,
-                readOnly: true,
-                onTap: () async {
-                  DateTime? newDate = await showDatePicker(
-                    context: context,
-                    firstDate: DateTime.now(),
-                    lastDate: DateTime.now().add(const Duration(days: 31)),
-                  );
+              //for date <Option not type>
+              Container(
+                height: 70,
+                margin: const EdgeInsets.symmetric(horizontal: 20),
+                child: TextFormField(
+                  controller: dateControll,
+                  readOnly: true,
+                  onTap: () async {
+                    DateTime? newDate = await showDatePicker(
+                      context: context,
+                      firstDate: transac.date,
+                      lastDate: transac.date.add(const Duration(days: 31)),
+                    );
 
-                  if (newDate != null) {
-                    setState(() {
-                      dateControll.text = DateFormat(
-                        "dd/MM/yy",
-                      ).format(newDate);
-                    });
-                  }
-                },
-                textAlign: TextAlign.center,
-                decoration: InputDecoration(
-                  hintText: "Date",
-                  filled: true,
-                  fillColor: const Color.fromARGB(15, 0, 0, 0),
-                  prefixIcon: Icon(Icons.calendar_today),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    borderSide: BorderSide.none,
+                    if (newDate != null) {
+                      setState(() {
+                        dateControll.text = DateFormat(
+                          "dd/MM/yy",
+                        ).format(newDate);
+                      });
+                      transac.date = newDate;
+                    }
+                  },
+                  textAlign: TextAlign.center,
+                  decoration: InputDecoration(
+                    hintText: "Today",
+                    filled: true,
+                    fillColor: const Color.fromARGB(15, 0, 0, 0),
+                    prefixIcon: Icon(Icons.calendar_today),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
+                      borderSide: BorderSide.none,
+                    ),
                   ),
                 ),
               ),
-            ),
-            Container(
-              height: 70,
-              margin: const EdgeInsets.symmetric(horizontal: 20),
-              child: dropBoxSelector(),
-            ),
-            SizedBox(
-              width: 180,
-              child: TextButton(
-                onPressed: () {},
-
-                style: TextButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-                ),
-                child: Text(
-                  "Add",
-                  style: TextStyle(
-                    color: Colors.blue[300],
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+              Container(
+                height: 70,
+                margin: const EdgeInsets.symmetric(horizontal: 20),
+                child: dropBoxSelector(),
               ),
-            ),
-          ],
+              SizedBox(
+                width: 180,
+                child: isloading
+                    ? const Center(child: CircularProgressIndicator())
+                    : TextButton(
+                        onPressed: () {
+                          //YAHA par SetState use kiya hai no idea why
+                          transac.amount = int.parse(costControll.text);
+                          if (localTransactionType == 1) {
+                            transac.amount *= -1;
+                          }
+                          transac.name = labelControll.text;
+
+                          context.read<CreateTransactionBloc>().add(
+                            CreateTransaction(transac),
+                          );
+                        },
+
+                        style: TextButton.styleFrom(
+                          backgroundColor: const Color.fromARGB(
+                            255,
+                            255,
+                            255,
+                            255,
+                          ),
+                        ),
+                        child: Text(
+                          "Add",
+                          style: TextStyle(
+                            color: Colors.blue[300],
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -2,6 +2,6 @@
 import 'package:expense_repository/expense_repository.dart';
 
 abstract class ExpenseRepository {
-  Future<void> createTrans(Transaction trans);
-  Future<void> getTrans();
+  Future<void> createTransaction(Transaction trans);
+  Future<List<Transaction>> getTransaction();
 }

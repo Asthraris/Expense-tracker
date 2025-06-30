@@ -7,7 +7,7 @@ class FirebaseExpenseRepo implements ExpenseRepository {
   final transCollection = FirebaseFirestore.instance.collection("Transactions");
 
   @override
-  Future<void> createTrans(Transaction trans) async {
+  Future<void> createTransaction(Transaction trans) async {
     try {
       await transCollection
           .doc(trans.trans_id)
@@ -19,7 +19,7 @@ class FirebaseExpenseRepo implements ExpenseRepository {
   }
 
   @override
-  Future<void> getTrans() async {
+  Future<List<Transaction>> getTransaction() async {
     try {
       return await transCollection.get().then(
         (value) => value.docs

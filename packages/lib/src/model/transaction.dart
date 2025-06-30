@@ -15,6 +15,14 @@ class Transaction {
     required this.name,
   });
 
+  static final empty = Transaction(
+    trans_id: "",
+    category: "",
+    date: DateTime.now(),
+    amount: 0,
+    name: "",
+  );
+
   TransactionEntity toEntity() {
     return TransactionEntity(
       category: category,

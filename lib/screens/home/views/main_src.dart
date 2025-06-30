@@ -1,10 +1,12 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:poorometer/data.dart';
+import 'package:expense_repository/expense_repository.dart';
+import 'package:intl/intl.dart';
 
 class MainScreen extends StatelessWidget {
-  const MainScreen({super.key});
+  final List<Transaction> transactions;
+  const MainScreen(this.transactions, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -226,7 +228,7 @@ class MainScreen extends StatelessWidget {
             const SizedBox(height: 12),
             Expanded(
               child: ListView.builder(
-                itemCount: transaction_data.length,
+                itemCount: transactions.length,
                 itemBuilder: (context, int i) {
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 10.0),
@@ -249,19 +251,21 @@ class MainScreen extends StatelessWidget {
                                       width: 50,
                                       height: 50,
                                       decoration: BoxDecoration(
-                                        color: transaction_data[i]["color"],
+                                        //Abhi ke liye categories to colors me divide nhi kiya hai
+                                        color: Colors.white,
                                         shape: BoxShape.circle,
                                       ),
                                     ),
                                     Icon(
-                                      transaction_data[i]["icons"],
+                                      //SAME HERE
+                                      Icons.money,
                                       size: 30,
                                     ),
                                   ],
                                 ),
                                 SizedBox(width: 10.0),
                                 Text(
-                                  transaction_data[i]["item"],
+                                  transactions[i].category,
                                   style: TextStyle(
                                     fontSize: 20,
                                     color: Theme.of(
@@ -276,7 +280,7 @@ class MainScreen extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 Text(
-                                  "₹ " + transaction_data[i]["total"],
+                                  "₹ " + (transactions[i].amount).toString(),
                                   //change color of text as per credit debit
                                   style: TextStyle(
                                     fontSize: 20,
@@ -287,7 +291,9 @@ class MainScreen extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  transaction_data[i]["date"],
+                                  DateFormat(
+                                    'dd/MM/yyyy',
+                                  ).format(transactions[i].date),
                                   style: TextStyle(
                                     fontSize: 16,
                                     color: Theme.of(
