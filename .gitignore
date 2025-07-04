@@ -26,6 +26,14 @@ linux/
 build/
 
 
+# Ignore platform-specific folders and build files
+/android/
+/ios/
+/windows/
+/linux/
+/build/
+
+
 
 # The .vscode folder contains launch configuration and tasks you configure ingit 
 # VS Code which you may wish to be included in version control, so this line
