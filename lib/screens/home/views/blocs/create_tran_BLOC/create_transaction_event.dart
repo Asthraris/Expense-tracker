@@ -8,10 +8,10 @@ sealed class CreateTransactionEvent extends Equatable {
 }
 
 class CreateTransaction extends CreateTransactionEvent {
-  final Transaction trans;
+  final Transaction transaction;
 
-  const CreateTransaction(this.trans);
+  const CreateTransaction({required this.transaction});
 
   @override
-  List<Object> get props => [trans];
+  List<Object> get props => [transaction];
 }

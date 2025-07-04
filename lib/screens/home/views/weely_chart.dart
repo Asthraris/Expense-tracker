@@ -46,17 +46,17 @@ class WeekChart extends StatelessWidget {
               barGroups: List.generate(7, (index) {
                 return BarChartGroupData(
                   x: index,
-                  barsSpace: 3,
+                  barsSpace: 1,
                   barRods: [
                     BarChartRodData(
                       toY: credits_weekly[index],
-                      width: 8,
+                      width: 15,
                       borderRadius: BorderRadius.circular(4),
                       color: const Color.fromARGB(255, 138, 255, 122),
                     ),
                     BarChartRodData(
                       toY: debits_weekly[index],
-                      width: 8,
+                      width: 15,
                       borderRadius: BorderRadius.circular(4),
                       color: Colors.redAccent.shade100,
                     ),

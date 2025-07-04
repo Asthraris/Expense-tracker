@@ -6,6 +6,7 @@ class Transaction {
   DateTime date;
   int amount;
   String name;
+  int card;
 
   Transaction({
     required this.trans_id,
@@ -13,6 +14,7 @@ class Transaction {
     required this.date,
     required this.amount,
     required this.name,
+    required this.card,
   });
 
   static final empty = Transaction(
@@ -21,6 +23,7 @@ class Transaction {
     date: DateTime.now(),
     amount: 0,
     name: "",
+    card: 0,
   );
 
   TransactionEntity toEntity() {
@@ -30,6 +33,7 @@ class Transaction {
       amount: amount,
       date: date,
       trans_id: trans_id,
+      card: card,
     );
   }
 
@@ -40,6 +44,7 @@ class Transaction {
       date: entity.date,
       amount: entity.amount,
       name: entity.name,
+      card: entity.card,
     );
   }
 }

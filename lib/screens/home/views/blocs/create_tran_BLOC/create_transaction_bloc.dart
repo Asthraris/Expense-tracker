@@ -14,7 +14,7 @@ class CreateTransactionBloc
     on<CreateTransaction>((event, emit) async {
       emit(CreateTransactionLoading());
       try {
-        await expenseRepository.createTransaction(event.trans);
+        await expenseRepository.createTransaction(event.transaction);
 
         emit(CreateTransactionSuccess());
       } catch (e) {

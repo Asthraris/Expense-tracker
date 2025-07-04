@@ -44,7 +44,7 @@ class _AddExpenseState extends State<AddExpense> {
       builder: (context, setState) {
         return DropdownMenu<String>(
           //idhar problem aa sakta if this func gets called before getting transaction instance
-          initialSelection: transac.category,
+          initialSelection: "Food",
           width: 1200,
           inputDecorationTheme: const InputDecorationTheme(
             filled: true,
@@ -187,7 +187,7 @@ class _AddExpenseState extends State<AddExpense> {
       child: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
         child: Container(
-          height: 550,
+          height: 750,
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.tertiary,
@@ -256,6 +256,7 @@ class _AddExpenseState extends State<AddExpense> {
                 child: TextFormField(
                   controller: dateControll,
                   readOnly: true,
+
                   onTap: () async {
                     DateTime? newDate = await showDatePicker(
                       context: context,
@@ -303,9 +304,11 @@ class _AddExpenseState extends State<AddExpense> {
                           }
                           transac.name = labelControll.text;
 
+                          //try one
                           context.read<CreateTransactionBloc>().add(
-                            CreateTransaction(transac),
+                            CreateTransaction(transaction: transac),
                           );
+                          Navigator.pop(context, true);
                         },
 
                         style: TextButton.styleFrom(

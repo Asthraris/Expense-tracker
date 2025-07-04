@@ -17,6 +17,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class HomeScreenState extends State<HomeScreen> {
+  int selectedCard = 0;
   int index = 0;
 
   @override
@@ -50,27 +51,33 @@ class HomeScreenState extends State<HomeScreen> {
             floatingActionButton: FloatingActionButton(
               shape: const CircleBorder(),
               onPressed: () async {
-                showModalBottomSheet(
+                final isSuccess = await showModalBottomSheet<bool>(
                   context: context,
                   backgroundColor: Colors.transparent,
                   isScrollControlled:
                       false, // set to true if you want full-screen behavior
                   builder: (_) {
-                    return MultiBlocProvider(
-                      providers: [
-                        BlocProvider(
-                          create: (context) =>
-                              CreateTransactionBloc(FirebaseExpenseRepo()),
-                        ),
-                      ],
+                    return BlocProvider(
+                      create: (_) =>
+                          CreateTransactionBloc(FirebaseExpenseRepo()),
                       child: const AddExpense(),
                     );
                   },
                 );
+                if (isSuccess == true) {
+                  context.read<GetTranBloc>().add(GetTransactions());
+                }
               },
               child: Icon(Icons.add),
             ),
-            body: index == 0 ? MainScreen(state.transactions) : statsScreen(),
+            body: index == 0
+                ? MainScreen(state.transactions, selectedCard, (newCard) {
+                    setState(() {
+                      selectedCard = newCard;
+                      log("Selected Card $selectedCard");
+                    });
+                  })
+                : statsScreen(),
           );
         } else {
           return const Scaffold(
