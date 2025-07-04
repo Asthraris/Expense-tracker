@@ -15,11 +15,11 @@ class MyAppView extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.dark(
           //change this theme app
-          surface: Color(0xFF181C14),
-          onSurface: Color(0xFFEAEFEF),
-          primary: Color(0xFFECDFCC),
-          secondary: Color(0xFF697565),
-          tertiary: Color(0xFF3C3D37),
+          surface: Color(0xFF000000),
+          onSurface: Color(0xFF988686),
+          primary: Color(0xFFD1D0D0),
+          secondary: Color(0xFF988686),
+          tertiary: Color(0xFF5C4E4E),
         ),
       ),
       home: BlocProvider(

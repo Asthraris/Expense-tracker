@@ -9,7 +9,8 @@ import 'package:poorometer/screens/home/views/blocs/get_tran_BLOC/get_tran_bloc.
 import 'package:uuid/uuid.dart';
 
 class AddExpense extends StatefulWidget {
-  const AddExpense({super.key});
+  final int selectedCard;
+  const AddExpense(this.selectedCard, {super.key});
 
   @override
   State<AddExpense> createState() => _AddExpenseState();
@@ -49,7 +50,7 @@ class _AddExpenseState extends State<AddExpense> {
           inputDecorationTheme: const InputDecorationTheme(
             filled: true,
             contentPadding: EdgeInsets.symmetric(horizontal: 20),
-            fillColor: const Color.fromARGB(15, 0, 0, 0),
+            fillColor: Color.fromARGB(15, 0, 0, 0),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.all(Radius.circular(30)),
             ),
@@ -217,6 +218,9 @@ class _AddExpenseState extends State<AddExpense> {
                   keyboardType: TextInputType.name,
                   textAlign: TextAlign.center,
                   decoration: InputDecoration(
+                    hintStyle: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                     hintText: "Label",
                     filled: true,
                     fillColor: const Color.fromARGB(50, 0, 0, 0),
@@ -236,7 +240,11 @@ class _AddExpenseState extends State<AddExpense> {
                   controller: costControll,
                   keyboardType: TextInputType.number,
                   textAlign: TextAlign.center,
+
                   decoration: InputDecoration(
+                    hintStyle: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                     hintText: "Cost",
                     filled: true,
                     fillColor: const Color.fromARGB(50, 0, 0, 0),
@@ -275,6 +283,9 @@ class _AddExpenseState extends State<AddExpense> {
                   },
                   textAlign: TextAlign.center,
                   decoration: InputDecoration(
+                    hintStyle: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                     hintText: "Today",
                     filled: true,
                     fillColor: const Color.fromARGB(15, 0, 0, 0),
@@ -297,6 +308,7 @@ class _AddExpenseState extends State<AddExpense> {
                     ? const Center(child: CircularProgressIndicator())
                     : TextButton(
                         onPressed: () {
+                          transac.card = widget.selectedCard;
                           //YAHA par SetState use kiya hai no idea why
                           transac.amount = int.parse(costControll.text);
                           if (localTransactionType == 1) {

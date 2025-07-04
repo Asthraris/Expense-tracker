@@ -21,6 +21,20 @@ class MainScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Map<String, List<dynamic>> categoriesIcon = {
+      "Food": [Icons.fastfood, Colors.orangeAccent],
+      "EMI": [Icons.account_balance, Colors.blueAccent],
+      "Rent": [Icons.home, Colors.lightGreenAccent],
+      "Transport": [Icons.directions_bus, Colors.blueGrey],
+      "Clothes": [Icons.checkroom, Colors.pinkAccent],
+      "Others": [Icons.more_horiz, Colors.grey],
+      "Debt": [Icons.real_estate_agent, Colors.redAccent],
+      "Bills": [Icons.receipt_long, Colors.purpleAccent],
+      "Education": [Icons.book, Colors.deepPurpleAccent],
+      "Shoping": [Icons.shopping_cart, Colors.lightBlueAccent],
+      "luxury": [Icons.auto_awesome, const Color.fromARGB(255, 150, 3, 45)],
+    };
+
     List<Map<String, dynamic>> userCards = [
       {
         "color": Colors.deepPurple,
@@ -109,10 +123,12 @@ class MainScreen extends StatelessWidget {
                             color: Theme.of(context).colorScheme.secondary,
                           ),
                         ),
-                        const Text(
+                        Text(
                           "Aman Gupta",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.primary,
+
                             fontSize: 20,
                           ),
                         ),
@@ -153,14 +169,32 @@ class MainScreen extends StatelessWidget {
                       child: Container(
                         width: MediaQuery.of(context).size.width - 30,
                         height: cardHeight,
-                        margin: const EdgeInsets.symmetric(horizontal: 5),
+                        margin: const EdgeInsets.symmetric(horizontal: 10),
                         decoration: BoxDecoration(
-                          color: userCards[i]["color"],
+                          gradient: const LinearGradient(
+                            colors: [
+                              Color.fromARGB(
+                                255,
+                                113,
+                                113,
+                                113,
+                              ), // Light silver-gray
+                              Color.fromARGB(255, 164, 164, 164), // Mid silver
+                              Color.fromARGB(
+                                255,
+                                56,
+                                56,
+                                56,
+                              ), // Soft silver highlight
+                            ],
+                            begin: Alignment.bottomCenter, // 45-degree start
+                            end: Alignment.topCenter, // 45-degree end
+                          ),
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: const [
                             BoxShadow(
                               blurRadius: 12,
-                              offset: Offset(0, 6),
+                              offset: Offset(0, 10),
                               color: Colors.black26,
                             ),
                           ],
@@ -277,10 +311,16 @@ class MainScreen extends StatelessWidget {
                             children: [
                               Row(
                                 children: [
-                                  const CircleAvatar(
+                                  CircleAvatar(
                                     radius: 25,
-                                    backgroundColor: Colors.white,
-                                    child: Icon(Icons.money, size: 30),
+                                    backgroundColor:
+                                        categoriesIcon[t.category]?[1] ??
+                                        Colors.grey,
+                                    child: Icon(
+                                      categoriesIcon[t.category]?[0] ??
+                                          Icons.help_outline,
+                                      size: 30,
+                                    ),
                                   ),
                                   const SizedBox(width: 10),
                                   Column(

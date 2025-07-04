@@ -23,7 +23,7 @@ class Transaction {
     date: DateTime.now(),
     amount: 0,
     name: "",
-    card: 0,
+    card: -1,
   );
 
   TransactionEntity toEntity() {

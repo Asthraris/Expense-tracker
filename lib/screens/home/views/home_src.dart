@@ -28,6 +28,7 @@ class HomeScreenState extends State<HomeScreen> {
           return Scaffold(
             // appBar: AppBar(),
             bottomNavigationBar: BottomNavigationBar(
+              currentIndex: index,
               onTap: (value) {
                 setState(() {
                   if (value > 1) log("Hacker hai bhai Hacker!");
@@ -38,6 +39,8 @@ class HomeScreenState extends State<HomeScreen> {
               backgroundColor: Theme.of(context).colorScheme.tertiary,
               showSelectedLabels: false,
               showUnselectedLabels: false,
+              selectedItemColor: const Color.fromARGB(255, 81, 197, 255),
+              unselectedItemColor: const Color.fromARGB(255, 152, 152, 152),
               items: const [
                 BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
                 BottomNavigationBarItem(
@@ -60,7 +63,7 @@ class HomeScreenState extends State<HomeScreen> {
                     return BlocProvider(
                       create: (_) =>
                           CreateTransactionBloc(FirebaseExpenseRepo()),
-                      child: const AddExpense(),
+                      child: AddExpense(selectedCard),
                     );
                   },
                 );
