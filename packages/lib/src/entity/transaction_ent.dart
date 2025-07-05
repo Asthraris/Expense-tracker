@@ -7,6 +7,7 @@ class TransactionEntity {
   int amount;
   String name;
   int card;
+  String userId;
 
   TransactionEntity({
     required this.trans_id,
@@ -15,6 +16,7 @@ class TransactionEntity {
     required this.amount,
     required this.name,
     required this.card,
+    required this.userId,
   });
 
   Map<String, Object?> toDocument() {
@@ -25,6 +27,7 @@ class TransactionEntity {
       'amount': amount,
       'name': name,
       'card': card,
+      'userId': userId,
     };
   }
 
@@ -36,6 +39,7 @@ class TransactionEntity {
       date: (doc['date'] as Timestamp).toDate(),
       amount: doc['amount'],
       card: doc['card'],
+      userId: doc['userId'],
     );
   }
 }

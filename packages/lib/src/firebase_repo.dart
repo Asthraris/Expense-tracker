@@ -19,19 +19,21 @@ class FirebaseExpenseRepo implements ExpenseRepository {
   }
 
   @override
-  Future<List<Transaction>> getTransaction() async {
+  Future<List<Transaction>> getTransaction({required String userId}) async {
     try {
-      return await transCollection.get().then(
-        (value) => value.docs
-            .map(
-              (e) => Transaction.fromEntity(
-                TransactionEntity.fromDocument(e.data()),
-              ),
-            )
-            .toList(),
-      );
+      final querySnapshot = await transCollection
+          .where('userId', isEqualTo: userId) // ✅ Filter by userId in Firestore
+          .get();
+
+      return querySnapshot.docs
+          .map(
+            (doc) => Transaction.fromEntity(
+              TransactionEntity.fromDocument(doc.data()),
+            ),
+          )
+          .toList();
     } catch (e) {
-      log(e.toString());
+      log("Error fetching transactions: $e");
       rethrow;
     }
   }

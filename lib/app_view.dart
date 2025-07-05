@@ -1,8 +1,5 @@
-import 'package:expense_repository/expense_repository.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:poorometer/screens/home/views/blocs/get_tran_BLOC/get_tran_bloc.dart';
-import 'package:poorometer/screens/home/views/home_src.dart';
+import 'package:poorometer/screens/home/authgate.dart';
 
 class MyAppView extends StatelessWidget {
   const MyAppView({super.key});
@@ -22,11 +19,7 @@ class MyAppView extends StatelessWidget {
           tertiary: Color(0xFF5C4E4E),
         ),
       ),
-      home: BlocProvider(
-        create: (context) =>
-            GetTranBloc(FirebaseExpenseRepo())..add(GetTransactions()),
-        child: const HomeScreen(),
-      ),
+      home: const AuthGate(),
     );
   }
 }

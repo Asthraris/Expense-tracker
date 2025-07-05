@@ -1,13 +1,14 @@
 import 'dart:developer';
 
 import 'package:expense_repository/expense_repository.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:poorometer/screens/home/views/add_exp.dart';
-import 'package:poorometer/screens/home/views/blocs/create_tran_BLOC/create_transaction_bloc.dart';
-import 'package:poorometer/screens/home/views/blocs/get_tran_BLOC/get_tran_bloc.dart';
+import 'package:poorometer/screens/home/views/components/add_exp.dart';
+import 'package:poorometer/screens/blocs/create_tran_BLOC/create_transaction_bloc.dart';
+import 'package:poorometer/screens/blocs/get_tran_BLOC/get_tran_bloc.dart';
 import 'package:poorometer/screens/home/views/main_src.dart';
-import 'package:poorometer/screens/home/views/stats-src.dart';
+import 'package:poorometer/screens/home/views/stats_src.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

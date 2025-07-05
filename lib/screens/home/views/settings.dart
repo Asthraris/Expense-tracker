@@ -1,9 +1,8 @@
-import 'dart:developer';
-
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:poorometer/screens/home/views/blocs/get_tran_BLOC/get_tran_bloc.dart';
+import 'package:poorometer/screens/home/auth_service.dart';
+import 'package:poorometer/screens/home/views/components/changepass_dia.dart';
 
 class Settings extends StatelessWidget {
   const Settings({super.key});
@@ -67,14 +66,6 @@ class Settings extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(8),
         children: [
-          ListTile(
-            title: Text("Sign In / Sign Up"),
-            leading: Icon(Icons.person_outline),
-            onTap: () {
-              // TODO: Trigger auth screen
-            },
-          ),
-
           ListTile(
             title: Text("Link Bank / Card"),
             leading: Icon(Icons.credit_card),
@@ -153,6 +144,48 @@ class Settings extends StatelessWidget {
             leading: Icon(Icons.info_outline),
             onTap: () {
               //TODO
+            },
+          ),
+          ListTile(
+            title: Text("Change Password"),
+            textColor: Colors.yellowAccent,
+            leading: Icon(Icons.password, color: Colors.yellowAccent),
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (context) => const ChangePasswordDialog(),
+              );
+            },
+          ),
+          ListTile(
+            title: Text("Log Out"),
+            textColor: Colors.orangeAccent,
+            leading: Icon(Icons.person_outline, color: Colors.orangeAccent),
+            onTap: () async {
+              try {
+                authService.value.signOut();
+                Navigator.pop(context);
+              } on FirebaseAuthException catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(e.message ?? "Failed of Logout")),
+                );
+              }
+            },
+          ),
+          ListTile(
+            title: Text("Delete Account"),
+            textColor: Colors.red,
+            leading: Icon(Icons.person_remove_alt_1_rounded, color: Colors.red),
+            onTap: () async {
+              try {
+                // authService.value.deleteAccount();
+              } on FirebaseAuthException catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(e.message ?? "Failed of Delete Account"),
+                  ),
+                );
+              }
             },
           ),
         ],

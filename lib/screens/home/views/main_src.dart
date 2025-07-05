@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:expense_repository/expense_repository.dart';
 import 'package:intl/intl.dart';
-import 'package:poorometer/screens/home/views/blocs/get_tran_BLOC/get_tran_bloc.dart';
+import 'package:poorometer/screens/blocs/get_tran_BLOC/get_tran_bloc.dart';
 import 'package:poorometer/screens/home/views/settings.dart';
 
 class MainScreen extends StatelessWidget {

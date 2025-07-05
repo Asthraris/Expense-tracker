@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:poorometer/screens/home/views/weely_chart.dart';
+import 'package:poorometer/screens/home/views/components/weely_chart.dart';
 
 class statsScreen extends StatelessWidget {
   const statsScreen({super.key});

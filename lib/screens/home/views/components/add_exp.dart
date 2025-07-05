@@ -1,10 +1,11 @@
 import 'package:expense_repository/expense_repository.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:poorometer/screens/home/views/blocs/create_tran_BLOC/create_transaction_bloc.dart';
-import 'package:poorometer/screens/home/views/blocs/get_tran_BLOC/get_tran_bloc.dart';
+import 'package:poorometer/screens/blocs/create_tran_BLOC/create_transaction_bloc.dart';
+import 'package:poorometer/screens/blocs/get_tran_BLOC/get_tran_bloc.dart';
 
 import 'package:uuid/uuid.dart';
 
@@ -315,6 +316,9 @@ class _AddExpenseState extends State<AddExpense> {
                             transac.amount *= -1;
                           }
                           transac.name = labelControll.text;
+
+                          transac.userId =
+                              FirebaseAuth.instance.currentUser!.uid;
 
                           //try one
                           context.read<CreateTransactionBloc>().add(
