@@ -78,10 +78,9 @@ class HomeScreenState extends State<HomeScreen> {
                 ? MainScreen(state.transactions, selectedCard, (newCard) {
                     setState(() {
                       selectedCard = newCard;
-                      log("Selected Card $selectedCard");
                     });
                   })
-                : statsScreen(),
+                : statsScreen(state.transactions),
           );
         } else {
           return const Scaffold(

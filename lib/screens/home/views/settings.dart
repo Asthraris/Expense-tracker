@@ -6,13 +6,31 @@ import 'package:poorometer/screens/home/views/components/changepass_dia.dart';
 
 class Settings extends StatelessWidget {
   const Settings({super.key});
-
-  Future<void> deleteAllTransactions(BuildContext context) async {
+  Future<void> deleteCardTransactions(
+    BuildContext context,
+    String userId,
+    int cardId,
+  ) async {
     final firestore = FirebaseFirestore.instance;
     final collection = firestore.collection('Transactions');
 
     try {
-      final snapshot = await collection.get();
+      final snapshot = await collection
+          .where('userId', isEqualTo: userId)
+          .where('card', isEqualTo: cardId)
+          .get();
+
+      if (snapshot.docs.isEmpty) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("No transactions found for this card."),
+            ),
+          );
+        }
+        return;
+      }
+
       final batch = firestore.batch();
 
       for (final doc in snapshot.docs) {
@@ -20,43 +38,52 @@ class Settings extends StatelessWidget {
       }
 
       await batch.commit();
-
-      if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(" All transactions deleted.")));
-      }
     } catch (e) {
-      print(" Error deleting transactions: $e");
+      print("Error deleting card transactions: $e");
       if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(" Failed to delete data.")));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Failed to delete card transactions.")),
+        );
       }
     }
   }
 
-  Future<void> addSingleCard() async {
-    final cardsRef = FirebaseFirestore.instance.collection('cards');
+  Future<void> deleteUserTransactions(
+    BuildContext context,
+    String userId,
+  ) async {
+    final firestore = FirebaseFirestore.instance;
+    final collection = firestore.collection('Transactions');
 
-    // Get the current highest _card index
-    final snapshot = await cardsRef
-        .orderBy('_card', descending: true)
-        .limit(1)
-        .get();
+    try {
+      final snapshot = await collection
+          .where('userId', isEqualTo: userId)
+          .get();
 
-    int maxCard = 0;
-    if (snapshot.docs.isNotEmpty) {
-      maxCard = snapshot.docs.first.data()['_card'] ?? 0;
-      maxCard += 1;
+      if (snapshot.docs.isEmpty) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("No transactions found to delete.")),
+          );
+        }
+        return;
+      }
+
+      final batch = firestore.batch();
+
+      for (final doc in snapshot.docs) {
+        batch.delete(doc.reference);
+      }
+
+      await batch.commit();
+    } catch (e) {
+      print("Error deleting transactions: $e");
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Failed to delete transactions.")),
+        );
+      }
     }
-
-    // Add a new card
-    await cardsRef.add({
-      'name': 'Card $maxCard',
-      'colorValue': Colors.primaries[maxCard % Colors.primaries.length].value,
-      '_card': maxCard,
-    });
   }
 
   @override
@@ -67,54 +94,171 @@ class Settings extends StatelessWidget {
         padding: const EdgeInsets.all(8),
         children: [
           ListTile(
-            title: Text("Link Bank / Card"),
-            leading: Icon(Icons.credit_card),
+            title: const Text("Reset One Card Transactions"),
+            leading: const Icon(Icons.credit_card),
             onTap: () async {
-              await addSingleCard();
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text("Card Added")));
+              showDialog(
+                context: context,
+                builder: (context) {
+                  int? selectedCard;
+                  final List<int> cardIds = [0, 1, 2];
+                  String getCardName(int cardId) {
+                    switch (cardId) {
+                      case 0:
+                        return "Personal";
+                      case 1:
+                        return "Savings";
+                      case 2:
+                        return "Business";
+                      default:
+                        return "Unknown";
+                    }
+                  }
+
+                  return StatefulBuilder(
+                    builder: (context, setState) {
+                      return AlertDialog(
+                        title: const Text("Clear Card Transactions!"),
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SizedBox(
+                              width: 200,
+                              child: DropdownButton<int>(
+                                hint: const Text("Select Card"),
+                                value: selectedCard,
+                                onChanged: (int? newValue) {
+                                  setState(() {
+                                    selectedCard = newValue;
+                                  });
+                                },
+                                items: cardIds.map((int cardId) {
+                                  return DropdownMenuItem<int>(
+                                    value: cardId,
+                                    child: Text(getCardName(cardId)),
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+                          ],
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            child: const Text(
+                              "Cancel",
+                              style: TextStyle(
+                                color: Colors.blue,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: selectedCard == null
+                                ? null // Disable if no card selected
+                                : () async {
+                                    try {
+                                      await deleteCardTransactions(
+                                        context,
+                                        FirebaseAuth.instance.currentUser!.uid,
+                                        selectedCard!,
+                                      );
+                                      if (context.mounted) {
+                                        Navigator.pop(context);
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              "Card $selectedCard cleared Successfully.",
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                    } on FirebaseAuthException catch (e) {
+                                      if (context.mounted) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              e.message ??
+                                                  "Failed to Delete Transactions",
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                    }
+                                  },
+                            child: const Text("Clear"),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+              );
             },
           ),
 
           ListTile(
-            title: Text("Delete Linked Card"),
+            title: Text("Clear Data"),
             leading: Icon(Icons.delete_forever),
             onTap: () {
-              // TODO: Confirm and remove card
-            },
-          ),
-
-          ListTile(
-            title: Text("Reset All Transactions"),
-            leading: Icon(Icons.delete_sweep),
-            onTap: () async {
-              final confirm = await showDialog<bool>(
+              showDialog(
                 context: context,
-                builder: (_) => AlertDialog(
-                  title: Text("Confirm Reset"),
-                  content: Text(
-                    "This will delete all transactions permanently. Continue?",
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context, false),
-                      child: Text("Cancel"),
-                    ),
-                    TextButton(
-                      onPressed: () => Navigator.pop(context, true),
-                      child: Text("Delete"),
-                    ),
-                  ],
-                ),
-              );
+                builder: (context) {
+                  return AlertDialog(
+                    title: const Text("Delete all your Transactions!"),
+                    content: Column(mainAxisSize: MainAxisSize.min),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: const Text(
+                          "Cancel",
+                          style: TextStyle(
+                            color: Colors.blue,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          try {
+                            await deleteUserTransactions(
+                              context,
+                              FirebaseAuth.instance.currentUser!.uid,
+                            );
+                            if (context.mounted) {
+                              Navigator.pop(context);
 
-              if (confirm == true) {
-                await deleteAllTransactions(context);
-              }
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text("Data deleted Successfully."),
+                                ),
+                              );
+                            }
+                          } on FirebaseAuthException catch (e) {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    e.message ??
+                                        "Failed to Delete Transactions",
+                                  ),
+                                ),
+                              );
+                            }
+                          }
+                        },
+                        child: const Text("Delete"),
+                      ),
+                    ],
+                  );
+                },
+              );
             },
           ),
-
           ListTile(
             title: Text("Change Currency"),
             leading: Icon(Icons.currency_exchange),
@@ -173,19 +317,98 @@ class Settings extends StatelessWidget {
             },
           ),
           ListTile(
-            title: Text("Delete Account"),
+            title: const Text("Delete Account"),
             textColor: Colors.red,
-            leading: Icon(Icons.person_remove_alt_1_rounded, color: Colors.red),
+            leading: const Icon(
+              Icons.person_remove_alt_1_rounded,
+              color: Colors.red,
+            ),
             onTap: () async {
-              try {
-                // authService.value.deleteAccount();
-              } on FirebaseAuthException catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(e.message ?? "Failed of Delete Account"),
-                  ),
-                );
-              }
+              showDialog(
+                context: context,
+                builder: (context) {
+                  final TextEditingController emailController =
+                      TextEditingController();
+                  final TextEditingController passwordController =
+                      TextEditingController();
+
+                  return AlertDialog(
+                    title: const Text("Confirm Account Deletion"),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TextField(
+                          controller: emailController,
+                          decoration: const InputDecoration(labelText: "Email"),
+                        ),
+                        TextField(
+                          controller: passwordController,
+                          decoration: const InputDecoration(
+                            labelText: "Password",
+                          ),
+                          obscureText: true,
+                        ),
+                      ],
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: const Text(
+                          "Cancel",
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          final email = emailController.text.trim();
+                          final password = passwordController.text.trim();
+                          Navigator.of(
+                            context,
+                          ).pop(); // Close the dialog before deletion
+
+                          try {
+                            await deleteUserTransactions(
+                              context,
+                              FirebaseAuth.instance.currentUser!.uid,
+                            );
+
+                            await authService.value.deleteAccount(
+                              email: email,
+                              password: password,
+                            );
+
+                            if (context.mounted) {
+                              Navigator.pop(context);
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    "Account Deleted Successfully.",
+                                  ),
+                                ),
+                              );
+                            }
+                          } on FirebaseAuthException catch (e) {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    e.message ?? "Failed to Delete Account",
+                                  ),
+                                ),
+                              );
+                            }
+                          }
+                        },
+                        child: const Text("Confirm"),
+                      ),
+                    ],
+                  );
+                },
+              );
             },
           ),
         ],

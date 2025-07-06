@@ -1,40 +1,61 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:expense_repository/expense_repository.dart';
 
 class WeekChartScreen extends StatelessWidget {
-  const WeekChartScreen({super.key});
+  final List<Transaction> transactions;
+
+  const WeekChartScreen(this.transactions, {super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
-        child: Padding(padding: EdgeInsets.all(16), child: WeekChart()),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: WeekChart(transactions),
+        ),
       ),
     );
   }
 }
 
 class WeekChart extends StatelessWidget {
-  const WeekChart({super.key});
+  final List<Transaction> weekTrans;
 
-  // REAL DATA
-  final List<double> credits_weekly = const [400, 10000, 500, 200, 300, 40, 30];
-  final List<double> debits_weekly = const [
-    2000,
-    1500,
-    1000,
-    1800,
-    2200,
-    1200,
-    1600,
-  ];
+  const WeekChart(this.weekTrans, {super.key});
 
   @override
   Widget build(BuildContext context) {
-    final allValues = [...credits_weekly, ...debits_weekly];
-    final maxY = getMaxY(allValues);
-    final interval = getInterval(maxY);
+    final Map<int, double> credits = {for (var i = 0; i < 7; i++) i: 0};
+    final Map<int, double> debits = {for (var i = 0; i < 7; i++) i: 0};
+
+    for (var transaction in weekTrans) {
+      final weekday = transaction.date.weekday; // Monday = 1, Sunday = 7
+      final index = weekday - 1; // 0-based index: 0 for Mon, 6 for Sun
+
+      if (index >= 0 && index < 7) {
+        if (transaction.amount >= 0) {
+          credits[index] =
+              (credits[index] ?? 0) + transaction.amount.toDouble();
+        } else {
+          debits[index] =
+              (debits[index] ?? 0) + transaction.amount.abs().toDouble();
+        }
+      }
+    }
+
+    final List<double> creditsWeekly = List.generate(7, (i) => credits[i] ?? 0);
+    final List<double> debitsWeekly = List.generate(7, (i) => debits[i] ?? 0);
+    final allValues = [...creditsWeekly, ...debitsWeekly];
+
+    double maxAmount = (allValues.isNotEmpty)
+        ? allValues.reduce((a, b) => a > b ? a : b)
+        : 0;
+    maxAmount = (maxAmount * 1.2).ceilToDouble();
+
+    final interval = getInterval(maxAmount);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -42,20 +63,20 @@ class WeekChart extends StatelessWidget {
         Expanded(
           child: BarChart(
             BarChartData(
-              maxY: maxY,
+              maxY: maxAmount,
               barGroups: List.generate(7, (index) {
                 return BarChartGroupData(
                   x: index,
                   barsSpace: 1,
                   barRods: [
                     BarChartRodData(
-                      toY: credits_weekly[index],
+                      toY: creditsWeekly[index],
                       width: 15,
                       borderRadius: BorderRadius.circular(4),
                       color: const Color.fromARGB(255, 138, 255, 122),
                     ),
                     BarChartRodData(
-                      toY: debits_weekly[index],
+                      toY: debitsWeekly[index],
                       width: 15,
                       borderRadius: BorderRadius.circular(4),
                       color: Colors.redAccent.shade100,
@@ -86,7 +107,7 @@ class WeekChart extends StatelessWidget {
                   sideTitles: SideTitles(showTitles: false),
                 ),
               ),
-              gridData: FlGridData(show: false), // Remove background grid
+              gridData: FlGridData(show: false),
               borderData: FlBorderData(show: false),
             ),
           ),
@@ -95,7 +116,6 @@ class WeekChart extends StatelessWidget {
     );
   }
 
-  // Rs. scale on the left
   Widget leftTitles(double value, TitleMeta meta) {
     return SideTitleWidget(
       meta: meta,
@@ -107,7 +127,6 @@ class WeekChart extends StatelessWidget {
     );
   }
 
-  // Days on the bottom
   Widget bottomTitles(double value, TitleMeta meta) {
     const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     final index = value.toInt();
@@ -125,13 +144,6 @@ class WeekChart extends StatelessWidget {
     );
   }
 
-  // Max Y axis value rounded nicely
-  double getMaxY(List<double> values) {
-    final max = values.reduce((a, b) => a > b ? a : b);
-    return (max * 1.2 / 1000).ceil() * 1000; // Add headroom & round
-  }
-
-  // Interval for Y axis
   double getInterval(double maxY) {
     if (maxY <= 1000) return 200;
     if (maxY <= 3000) return 500;

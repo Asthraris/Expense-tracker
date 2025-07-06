@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:expense_repository/expense_repository.dart';
@@ -124,7 +125,8 @@ class MainScreen extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          "Aman Gupta",
+                          FirebaseAuth.instance.currentUser!.displayName ??
+                              "User",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Theme.of(context).colorScheme.primary,

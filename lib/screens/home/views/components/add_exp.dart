@@ -89,6 +89,8 @@ class _AddExpenseState extends State<AddExpense> {
     );
   }
 
+  DateTime onlyDate(DateTime date) => DateTime(date.year, date.month, date.day);
+
   Widget creditDebitSlider() {
     return GestureDetector(
       onHorizontalDragEnd: (details) {
@@ -161,6 +163,7 @@ class _AddExpenseState extends State<AddExpense> {
     dateControll.text = DateFormat("dd/MM/yy").format(transac.date);
     //start your transaction as defualt calegory , i am not HARDcoding it in backend
     transac.trans_id = Uuid().v1();
+    transac.date = onlyDate(transac.date);
     super.initState();
   }
 
@@ -269,8 +272,9 @@ class _AddExpenseState extends State<AddExpense> {
                   onTap: () async {
                     DateTime? newDate = await showDatePicker(
                       context: context,
-                      firstDate: transac.date,
-                      lastDate: transac.date.add(const Duration(days: 31)),
+                      initialDate: transac.date,
+                      firstDate: transac.date.subtract(const Duration(days: 3)),
+                      lastDate: transac.date.add(const Duration(days: 3)),
                     );
 
                     if (newDate != null) {

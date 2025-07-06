@@ -91,11 +91,44 @@ class _LoginScreenState extends State<LoginScreen> {
                     TextButton(
                       onPressed: () async {
                         if (_formKey.currentState!.validate()) {
-                          // TODO: Add your 'Signin' logic here
                           try {
                             await authService.value.createAccount(
                               email: _emailController.text,
                               password: _passwordController.text,
+                            );
+                            //add an  dialog widget which will have username_input with confirm button after confirm we will call next function .onLoginSuccess();
+                            // Show dialog to get username after account creation
+
+                            String username = '';
+                            await showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: const Text("Enter Username"),
+                                  content: TextField(
+                                    onChanged: (value) {
+                                      username = value;
+                                    },
+                                    decoration: const InputDecoration(
+                                      hintText: "Username",
+                                    ),
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        if (username.trim().isNotEmpty) {
+                                          authService.value.updateUserName(
+                                            username: username,
+                                          );
+                                          Navigator.of(context).pop();
+                                        }
+                                      },
+                                      child: const Text("Confirm"),
+                                    ),
+                                  ],
+                                );
+                              },
                             );
                             widget.onLoginSuccess();
                           } on FirebaseAuthException catch (e) {
