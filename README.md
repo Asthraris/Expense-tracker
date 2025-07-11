@@ -1,16 +1,70 @@
-# poorometer
+**Poorometer** is a fully functional, scalable expense tracker app built using **Flutter** and **Firebase**.  
+It’s designed to help users manage multiple expense cards, track transactions, and visualize weekly spending—while keeping the architecture clean, modular, and ready to scale.
 
-A new Flutter project.
+---
 
-## Getting Started
+## 🚀 Features
 
-This project is a starting point for a Flutter application.
+- **User Authentication**  
+  - Firebase Authentication for persistent user sessions  
+  - Sign Up / Login / Logout  
+  - Password updates, username change  
+  - Full account deletion (wipes all user data)
 
-A few resources to get you started if this is your first Flutter project:
+- **Expense Tracking (Per Card)**  
+  - Supports multiple cards: *Personal*, *Business*, *Savings*  
+  - Swipe between cards to view specific transactions  
+  - Transactions automatically linked to selected card  
+  - Easy transaction creation with dynamic card association
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- **Statistics & Analytics**  
+  - Weekly spending graph powered by `fl_chart`  
+  - Automatic updates as user adds/removes transactions  
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- **Settings & Data Controls**  
+  - Reset transactions and cards  
+  - Secure password change & username updates  
+  - Account deletion for full data removal
+
+- **Additional Features**  
+  - Pull-to-refresh for real-time Firebase sync  
+  - Clean separation between UI, business logic, and backend layers using BLoC & Repository pattern  
+  - Modular backend as a separate Dart package (managing Firebase operations)
+
+---
+
+## 🏗️ Tech Stack
+
+- **Flutter** (Frontend)
+- **Firebase Authentication** (User Management)
+- **Firebase Firestore** (Database)
+- **BLoC (Business Logic Component)** (State Management)
+- **fl_chart** (Graphs & Charts)
+- Custom **Dart** Backend Package (for Firebase operations)
+
+---
+
+## 📊 App Flow
+
+1. User signs in or signs up.
+2. Selects between **Personal / Business / Savings** cards (swipeable UI).
+3. Adds or views transactions linked to the selected card.
+4. Tracks expenses over the week via the Stats page graph.
+5. Manages settings, including data resets and account operations.
+
+---
+
+## 🎯 Current Status:  
+✅ Core features complete and functional  
+✅ Firebase integration working end-to-end  
+✅ Ready for future feature expansions or UI polishing
+
+---
+
+## ⚠️ Disclaimer:
+It’s built with a focus on clean architecture, modularity, and real-world app structure.
+> You can use this app for Yours personal app without any worry🥰
+
+---
+
+## MIT License:
