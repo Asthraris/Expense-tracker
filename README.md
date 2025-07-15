@@ -67,4 +67,4 @@ It’s built with a focus on clean architecture, modularity, and real-world app 
 
 ---
 
-## MIT License:
+used under MIT License
