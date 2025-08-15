@@ -4,6 +4,8 @@ It’s designed to help users manage multiple expense cards, track transactions,
 <div style="display: flex;">
   <img src="home_src.png" alt="Home Page" width="30%">
   <img src="add_exp.png" alt="Expense Page" width="30%">
+  <img src="stats.png" alt="Stats Page" width="30%">
+  
 </div>
 ---
 
