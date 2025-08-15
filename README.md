@@ -2,8 +2,8 @@
 It’s designed to help users manage multiple expense cards, track transactions, and visualize weekly spending—while keeping the architecture clean, modular, and ready to scale.
 
 <div style="display: flex;">
-  <img src="home_src.png" alt="Home Page" width="50%">
-  <img src="add_exp.png" alt="Expense Page" width="50%">
+  <img src="home_src.png" alt="Home Page" width="30%">
+  <img src="add_exp.png" alt="Expense Page" width="30%">
 </div>
 ---
 
