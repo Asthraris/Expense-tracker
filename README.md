@@ -1,8 +1,10 @@
 **Poorometer** is a fully functional, scalable expense tracker app built using **Flutter** and **Firebase**.  
 It’s designed to help users manage multiple expense cards, track transactions, and visualize weekly spending—while keeping the architecture clean, modular, and ready to scale.
 
-![Home](home_src.png)
-
+<div style="display: flex;">
+  <img src="home_src.png" alt="Home Page" width="50%">
+  <img src="add_exp.png" alt="Expense Page" width="50%">
+</div>
 ---
 
 ## 🚀 Features
